@@ -81,7 +81,7 @@ CREATE TABLE HEROI (
   historia VARCHAR(255) NOT NULL,
   idcriatura_associada INT NOT NULL,
   iduniverso_origem INT NOT NULL,
-  PRIMARY KEY (nome, idcriatura_associada, iduniverso_origem),
+  PRIMARY KEY (nome, iduniverso_origem),
   CONSTRAINT fk_heroi_criatura
     FOREIGN KEY (idcriatura_associada)
     REFERENCES CRIATURA (idcriatura),
