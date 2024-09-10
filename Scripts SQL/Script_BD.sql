@@ -8,7 +8,7 @@ CREATE TYPE nivel_perigo_enum AS ENUM ('baixo', 'medio', 'alto', 'altissimo');
 -- -----------------------------------------------------
 CREATE TABLE CLASSE (
   nome VARCHAR(45) NOT NULL PRIMARY KEY,
-  mito VARCHAR(255) NOT NULL,
+  descricao VARCHAR(255) NOT NULL, -- Alterado de mito para descricao
   UNIQUE (nome)
 );
 
@@ -19,7 +19,7 @@ CREATE TABLE CRIATURA (
   idcriatura SERIAL,
   nome VARCHAR(45) NOT NULL,
   data_nasc DATE NOT NULL,
-  historia VARCHAR(255),
+  descricao VARCHAR(255), -- Alterado de historia para descricao
   classe VARCHAR(45) NOT NULL,
   PRIMARY KEY (idcriatura, classe),
   UNIQUE (idcriatura),
