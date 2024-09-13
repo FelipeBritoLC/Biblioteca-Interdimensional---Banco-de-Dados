@@ -161,3 +161,21 @@ INSERT INTO PODER (nome, descricao, poder_gerador, nivel_perigo_nome) VALUES
 ('Dobra de Metal', 'Permite ao usuário manipular e dobrar o metal, uma forma avançada de dobra de terra.', 'Controle da Terra', 'alto'),
 ('Dobra de Relâmpago', 'Permite ao usuário gerar e redirecionar relâmpagos, uma técnica avançada de dobra de fogo.', 'Controle de Fogo', 'altissimo');
 
+INSERT INTO CRIATURA_TEM_PODER (idcriatura, classe_criatura, poder) VALUES
+((SELECT idcriatura FROM criatura WHERE nome = 'Dragão'), 'Animais Místicos', 'Cuspir Fogo'),
+((SELECT idcriatura FROM criatura WHERE nome = 'Hidra de Lerna'), 'Seres Monstruosos', 'Cuspir Fogo'),
+((SELECT idcriatura FROM criatura WHERE nome = 'Mago'), 'Seres Magos e Bruxos', 'Ler Mentes'),
+((SELECT idcriatura FROM criatura WHERE nome = 'Mago'), 'Seres Magos e Bruxos', 'Telecinese'),
+((SELECT idcriatura FROM criatura WHERE nome = 'Mago'), 'Seres Magos e Bruxos', 'Transmutação'),
+((SELECT idcriatura FROM criatura WHERE nome = 'Mago'), 'Seres Magos e Bruxos', 'Teletransporte'),
+((SELECT idcriatura FROM criatura WHERE nome = 'Mago'), 'Seres Magos e Bruxos', 'Lançar Feitiços'),
+((SELECT idcriatura FROM criatura WHERE nome = 'Bruxo'), 'Seres Magos e Bruxos', 'Lançar Feitiços'),
+((SELECT idcriatura FROM criatura WHERE nome = 'Bruxo'), 'Seres Magos e Bruxos', 'Telecinese'),
+((SELECT idcriatura FROM criatura WHERE nome = 'Avatar'), 'Seres Humanos', 'Controle da Água'),
+((SELECT idcriatura FROM criatura WHERE nome = 'Avatar'), 'Seres Humanos', 'Controle de Fogo'),
+((SELECT idcriatura FROM criatura WHERE nome = 'Avatar'), 'Seres Humanos', 'Controle do Ar'),
+((SELECT idcriatura FROM criatura WHERE nome = 'Avatar'), 'Seres Humanos', 'Controle da Terra'),
+((SELECT idcriatura FROM criatura WHERE nome = 'Avatar'), 'Seres Humanos', 'Dobra de Sangue'),
+((SELECT idcriatura FROM criatura WHERE nome = 'Avatar'), 'Seres Humanos', 'Dobra de Metal'),
+((SELECT idcriatura FROM criatura WHERE nome = 'Avatar'), 'Seres Humanos', 'Dobra de Relâmpago');
+
