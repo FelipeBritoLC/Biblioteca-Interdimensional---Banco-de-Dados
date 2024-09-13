@@ -1,7 +1,11 @@
 -- -----------------------------------------------------
--- Criando o tipo ENUM da tabela Nivel_Perigo
+-- Criando a table nivel_perigo
 -- -----------------------------------------------------
-CREATE TYPE nivel_perigo_enum AS ENUM ('baixo', 'medio', 'alto', 'altissimo');
+CREATE TABLE nivel_perigo (
+  id SERIAL PRIMARY KEY,
+  nome VARCHAR(45) NOT NULL UNIQUE
+);
+
 
 -- -----------------------------------------------------
 -- Table CLASSE
@@ -109,10 +113,12 @@ CREATE TABLE PODER (
   nome VARCHAR(45) NOT NULL,
   descricao VARCHAR(255) NOT NULL,
   poder_gerador VARCHAR(45) NOT NULL,
-  nivel_perigo nivel_perigo_enum NOT NULL,
-  PRIMARY KEY (nome, poder_gerador, nivel_perigo),
-  UNIQUE (nome), 
-  UNIQUE (poder_gerador, nivel_perigo), 
+  nivel_perigo_id INT NOT NULL,
+  PRIMARY KEY (nome, poder_gerador, nivel_perigo_id),
+  UNIQUE (nome),
+  UNIQUE (poder_gerador, nivel_perigo_id),
+  FOREIGN KEY (nivel_perigo_id)
+    REFERENCES nivel_perigo (id),
   FOREIGN KEY (poder_gerador)
     REFERENCES PODER (nome)
 );
