@@ -2,8 +2,7 @@
 -- Criando a table nivel_perigo
 -- -----------------------------------------------------
 CREATE TABLE nivel_perigo (
-  id SERIAL PRIMARY KEY,
-  nome VARCHAR(45) NOT NULL UNIQUE
+  nome VARCHAR(45) PRIMARY KEY
 );
 
 
@@ -113,12 +112,12 @@ CREATE TABLE PODER (
   nome VARCHAR(45) NOT NULL,
   descricao VARCHAR(255) NOT NULL,
   poder_gerador VARCHAR(45) NOT NULL,
-  nivel_perigo_id INT NOT NULL,
-  PRIMARY KEY (nome, poder_gerador, nivel_perigo_id),
+  nivel_perigo_nome VARCHAR(45) NOT NULL,
+  PRIMARY KEY (nome, poder_gerador, nivel_perigo_nome),
   UNIQUE (nome),
-  UNIQUE (poder_gerador, nivel_perigo_id),
-  FOREIGN KEY (nivel_perigo_id)
-    REFERENCES nivel_perigo (id),
+  UNIQUE (poder_gerador, nivel_perigo_nome),
+  FOREIGN KEY (nivel_perigo_nome)
+    REFERENCES nivel_perigo (nome),
   FOREIGN KEY (poder_gerador)
     REFERENCES PODER (nome)
 );

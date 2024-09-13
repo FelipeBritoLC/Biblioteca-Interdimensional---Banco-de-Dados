@@ -120,11 +120,22 @@ INSERT INTO UNIVERSO (nome, ano_surgimento, historia_origem) VALUES
 
 -- Inserindo heróis associados a criaturas
 INSERT INTO HEROI (nome, data_nasc, historia, idcriatura_associada, iduniverso_origem) VALUES
-('Harry Potter', '1992-07-31', 'O famoso bruxo que sobreviveu e derrotou Voldemort.', 188, 6),
-('Perseu', '1190-01-01', 'Herói grego que derrotou Medusa.', 190, 7),
-('Hércules', '1200-01-01', 'Herói grego conhecido por sua força e por completar os 12 Trabalhos.', 190, 7),
-('Arthur', '500-01-01', 'Rei lendário da Bretanha, portador da espada Excalibur.', 192, 8),
-('Merlim', '200-11-04', 'Lendário mago da era medieval, conhecido por sua sabedoria, poderes mágicos e papel crucial como conselheiro do Rei Arthur.', 189, 8),
-('Banguela', '300-06-02', 'Dragão raro da espécie Fúria da Noite, inteligente, ágil, com habilidades de voo excepcionais e poderosa rajada de fogo.', 184, 9),
-('Marsias', '1300-09-04', 'Um sátiro habilidoso com a flauta, desafiou Apolo em um concurso musical. Sua bravura em enfrentar um deus e sua arte o tornaram um herói trágico da mitologia grega..', 171, 7),
-('Percy Jackson', '2003-01-23', 'Filho de Poseidon, se tornou um herói ao recuperar raio roubado de Zeus', 190, 7);
+('Harry Potter', '1992-07-31', 'O famoso bruxo que sobreviveu e derrotou Voldemort.', 92, 6),
+('Perseu', '1190-01-01', 'Herói grego que derrotou Medusa.', 94, 7),
+('Hércules', '1200-01-01', 'Herói grego conhecido por sua força e por completar os 12 Trabalhos.', 94, 7),
+('Arthur', '500-01-01', 'Rei lendário da Bretanha, portador da espada Excalibur.', 96, 8),
+('Merlim', '200-11-04', 'Lendário mago da era medieval, conhecido por sua sabedoria, poderes mágicos e papel crucial como conselheiro do Rei Arthur.', 93, 8),
+('Banguela', '300-06-02', 'Dragão raro da espécie Fúria da Noite, inteligente, ágil, com habilidades de voo excepcionais e poderosa rajada de fogo.', 88, 9),
+('Marsias', '1300-09-04', 'Um sátiro habilidoso com a flauta, desafiou Apolo em um concurso musical. Sua bravura em enfrentar um deus e sua arte o tornaram um herói trágico da mitologia grega..', 75, 7),
+('Percy Jackson', '2003-01-23', 'Filho de Poseidon, se tornou um herói ao recuperar raio roubado de Zeus', 94, 7);
+
+INSERT INTO nivel_perigo (nome) VALUES
+('inofensivo'),
+('muito baixo'),
+('baixo'),
+('medio'),
+('alto'),
+('muito alto'),
+('morte certa');
+
+
