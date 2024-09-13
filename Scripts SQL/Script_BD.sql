@@ -18,7 +18,6 @@ CREATE TABLE CLASSE (
 CREATE TABLE CRIATURA (
   idcriatura SERIAL,
   nome VARCHAR(45) NOT NULL,
-  data_nasc DATE NOT NULL,
   descricao VARCHAR(255), -- Alterado de historia para descricao
   classe VARCHAR(45) NOT NULL,
   PRIMARY KEY (idcriatura, classe),
@@ -81,6 +80,7 @@ CREATE TABLE HEROI (
   historia VARCHAR(255) NOT NULL,
   idcriatura_associada INT NOT NULL,
   iduniverso_origem INT NOT NULL,
+  data_nasc DATE NOT NULL,  -- Atributo adicionado
   PRIMARY KEY (nome, iduniverso_origem),
   CONSTRAINT fk_heroi_criatura
     FOREIGN KEY (idcriatura_associada)
