@@ -109,12 +109,10 @@ CREATE TABLE LOCALIZACAO (
 -- Table PODER 
 -- -----------------------------------------------------
 CREATE TABLE PODER (
-  nome VARCHAR(45) NOT NULL,
+  nome VARCHAR(45) NOT NULL PRIMARY KEY,
   descricao VARCHAR(255) NOT NULL,
-  poder_gerador VARCHAR(45) NOT NULL,
+  poder_gerador VARCHAR(45),
   nivel_perigo_nome VARCHAR(45) NOT NULL,
-  PRIMARY KEY (nome, poder_gerador, nivel_perigo_nome),
-  UNIQUE (nome),
   UNIQUE (poder_gerador, nivel_perigo_nome),
   FOREIGN KEY (nivel_perigo_nome)
     REFERENCES nivel_perigo (nome),

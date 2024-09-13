@@ -71,7 +71,8 @@ INSERT INTO CRIATURA (nome, descricao, classe) VALUES
 -- Semi-Deus e Deuses
 ('Semi-Deus', 'Seres nascidos da união entre um deus e um mortal, possuindo força, habilidades e características divinas.', 'Semi-Deus e Deuses'),
 ('Deus Grego', 'Seres poderosos que governam aspectos da vida e da natureza, com personalidades humanas e habilidades divinas.', 'Semi-Deus e Deuses'),
-('Humano', 'Espécie inteligente do planeta Terra.', 'Seres Humanos');
+('Humano', 'Espécie inteligente do planeta Terra.', 'Seres Humanos'),
+('Avatar', 'Ser mítico que pode controlar os quatro elementos: ar, água, terra e fogo.', 'Seres Humanos');
 
 -- Inserir características na tabela CARACTERISTICA
 INSERT INTO CARACTERISTICA (descricao, classe) VALUES
@@ -120,22 +121,43 @@ INSERT INTO UNIVERSO (nome, ano_surgimento, historia_origem) VALUES
 
 -- Inserindo heróis associados a criaturas
 INSERT INTO HEROI (nome, data_nasc, historia, idcriatura_associada, iduniverso_origem) VALUES
-('Harry Potter', '1992-07-31', 'O famoso bruxo que sobreviveu e derrotou Voldemort.', 92, 6),
-('Perseu', '1190-01-01', 'Herói grego que derrotou Medusa.', 94, 7),
-('Hércules', '1200-01-01', 'Herói grego conhecido por sua força e por completar os 12 Trabalhos.', 94, 7),
-('Arthur', '500-01-01', 'Rei lendário da Bretanha, portador da espada Excalibur.', 96, 8),
-('Merlim', '200-11-04', 'Lendário mago da era medieval, conhecido por sua sabedoria, poderes mágicos e papel crucial como conselheiro do Rei Arthur.', 93, 8),
-('Banguela', '300-06-02', 'Dragão raro da espécie Fúria da Noite, inteligente, ágil, com habilidades de voo excepcionais e poderosa rajada de fogo.', 88, 9),
-('Marsias', '1300-09-04', 'Um sátiro habilidoso com a flauta, desafiou Apolo em um concurso musical. Sua bravura em enfrentar um deus e sua arte o tornaram um herói trágico da mitologia grega..', 75, 7),
-('Percy Jackson', '2003-01-23', 'Filho de Poseidon, se tornou um herói ao recuperar raio roubado de Zeus', 94, 7);
+
+('Harry Potter', '1992-07-31', 'O famoso bruxo que sobreviveu e derrotou Voldemort.', (SELECT idcriatura FROM criatura WHERE nome = 'Bruxo'), (SELECT iduniverso FROM universo WHERE nome = 'Hogwarts')),
+
+('Perseu', '1190-01-01', 'Herói grego que derrotou Medusa.', (SELECT idcriatura FROM criatura WHERE nome = 'Semi-Deus'), (SELECT iduniverso FROM universo WHERE nome = 'Monte Olimpo')),
+
+('Hércules', '1200-01-01', 'Herói grego conhecido por sua força e por completar os 12 Trabalhos.', (SELECT idcriatura FROM criatura WHERE nome = 'Semi-Deus'), (SELECT iduniverso FROM universo WHERE nome = 'Monte Olimpo')),
+
+('Arthur', '500-01-01', 'Rei lendário da Bretanha, portador da espada Excalibur.', (SELECT idcriatura FROM criatura WHERE nome = 'Humano'), (SELECT iduniverso FROM universo WHERE nome = 'Grã-Bretanha')),
+
+('Merlim', '200-11-04', 'Lendário mago da era medieval, conhecido por sua sabedoria, poderes mágicos e papel crucial como conselheiro do Rei Arthur.', (SELECT idcriatura FROM criatura WHERE nome = 'Mago'), (SELECT iduniverso FROM universo WHERE nome = 'Grã-Bretanha')),
+
+('Banguela', '300-06-02', 'Dragão raro da espécie Fúria da Noite, inteligente, ágil, com habilidades de voo excepcionais e poderosa rajada de fogo.', (SELECT idcriatura FROM criatura WHERE nome = 'Dragão'), (SELECT iduniverso FROM universo WHERE nome = 'Ilha dos Dragões')),
+
+('Marsias', '1300-09-04', 'Um sátiro habilidoso com a flauta, desafiou Apolo em um concurso musical. Sua bravura em enfrentar um deus e sua arte o tornaram um herói trágico da mitologia grega..', (SELECT idcriatura FROM criatura WHERE nome = 'Sátiro'), (SELECT iduniverso FROM universo WHERE nome = 'Monte Olimpo')),
+
+('Percy Jackson', '2003-01-23', 'Filho de Poseidon, se tornou um herói ao recuperar raio roubado de Zeus', (SELECT idcriatura FROM criatura WHERE nome = 'Semi-Deus'), (SELECT iduniverso FROM universo WHERE nome = 'Monte Olimpo'));
+
+
 
 INSERT INTO nivel_perigo (nome) VALUES
-('inofensivo'),
-('muito baixo'),
-('baixo'),
 ('medio'),
 ('alto'),
-('muito alto'),
-('morte certa');
+('altissimo');
 
+
+INSERT INTO PODER (nome, descricao, poder_gerador, nivel_perigo_nome) VALUES
+('Cuspir Fogo', 'Permite ao usuário exalar fogo de sua boca.', NULL, 'alto'),
+('Controle da Água', 'Dá ao usuário a capacidade de manipular a água em qualquer forma.', NULL, 'alto'),
+('Controle de Fogo', 'Permite ao usuário manipular e controlar o fogo.', NULL, 'altissimo'),
+('Controle do Ar', 'Permite ao usuário manipular e controlar o ar e os ventos.', NULL, 'medio'),
+('Controle da Terra', 'Permite ao usuário manipular e controlar a terra e rochas.', NULL, 'alto'),
+('Ler Mentes', 'Permite ao usuário ler e compreender os pensamentos das pessoas.', NULL, 'altissimo'),
+('Telecinese', 'Permite ao usuário mover objetos com a mente.', NULL, 'alto'),
+('Lançar Feitiços', 'Permite ao usuário conjurar feitiços variados com diferentes efeitos.', NULL, 'medio'),
+('Transmutação', 'Permite transformar objetos e seres vivos em outras formas.', NULL, 'altissimo'),
+('Teletransporte', 'Permite ao usuário se transportar instantaneamente para outro local.', NULL, 'altissimo'),
+('Dobra de Sangue', 'Permite ao usuário manipular o sangue dentro dos corpos, controlando os movimentos de outras criaturas.', 'Controle da Água', 'altissimo'),
+('Dobra de Metal', 'Permite ao usuário manipular e dobrar o metal, uma forma avançada de dobra de terra.', 'Controle da Terra', 'alto'),
+('Dobra de Relâmpago', 'Permite ao usuário gerar e redirecionar relâmpagos, uma técnica avançada de dobra de fogo.', 'Controle de Fogo', 'altissimo');
 
