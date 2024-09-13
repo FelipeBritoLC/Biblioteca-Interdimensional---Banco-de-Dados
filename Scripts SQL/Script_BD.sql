@@ -68,8 +68,9 @@ CREATE TABLE GUARDIAO (
 -- -----------------------------------------------------
 CREATE TABLE UNIVERSO (
   iduniverso SERIAL PRIMARY KEY,
+  nome VARCHAR(45) NOT NULL,
   ano_surgimento INT NOT NULL,
-  historia_origem VARCHAR(45)
+  historia_origem VARCHAR(255)
 );
 
 -- -----------------------------------------------------
