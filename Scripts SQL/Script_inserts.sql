@@ -140,7 +140,7 @@ INSERT INTO HEROI (nome, data_nasc, historia, idcriatura_associada, iduniverso_o
 
 
 
-INSERT INTO nivel_perigo (nome) VALUES
+INSERT INTO NIVEL_PERIGO (nome) VALUES
 ('medio'),
 ('alto'),
 ('altissimo');
@@ -178,4 +178,65 @@ INSERT INTO CRIATURA_TEM_PODER (idcriatura, classe_criatura, poder) VALUES
 ((SELECT idcriatura FROM criatura WHERE nome = 'Avatar'), 'Seres Humanos', 'Dobra de Sangue'),
 ((SELECT idcriatura FROM criatura WHERE nome = 'Avatar'), 'Seres Humanos', 'Dobra de Metal'),
 ((SELECT idcriatura FROM criatura WHERE nome = 'Avatar'), 'Seres Humanos', 'Dobra de Relâmpago');
+
+INSERT INTO MAGIZOOLOGISTA (cum, nome, data_nasc) VALUES
+('1234567890ABCD1', 'Newt Scamander', '1897-02-24'),
+('0987654321EFGH2', 'Luna Lovegood', '1981-02-13'),
+('1122334455IJKL3', 'Rubeus Hagrid', '1928-12-06'),
+('5566778899MNOP4', 'Bruno Wildfang', '1975-07-19'),
+('6677889900QRST5', 'Fiona Moonbreeze', '1983-05-10'),
+('7766554433UVWX6', 'Oliver Woodhart', '1970-11-22'),
+('3344556677YZAB7', 'Elara Starwind', '1987-03-03'),
+('9988776655CDEF8', 'Tobias Swiftfoot', '1990-01-17'),
+('8877665544GHIJ9', 'Ariana Willowshade', '1979-04-15'),
+('2233445566KLMN0', 'Cedric Thundereye', '1985-09-29');
+
+INSERT INTO GUARDIAO (nivel, guardiao_cum, data_formacao) VALUES
+(5, '1234567890ABCD1', '2010-07-14'),
+(4, '0987654321EFGH2', '2015-06-21'),
+(10, '1122334455IJKL3', '2000-09-10'),
+(5, '5566778899MNOP4', '2005-11-05'),
+(1, '6677889900QRST5', '2009-04-03');
+
+
+INSERT INTO CACADOR_DE_RECOMPENSA (especialidade, equipamentos, cacador_cum) VALUES
+('Dragões', 'Lança e Rede Mágica', '7766554433UVWX6'),
+('Hipogrifos', 'Lança Leve e Cordas de Seda Mágica','3344556677YZAB7'),
+('Grifos', 'Espada Encantada e Armadilha Rápida', '9988776655CDEF8'),
+('Quimeras', 'Armadilhas especializadas', '8877665544GHIJ9'),
+('Trolls', 'Rede de Constrição Mágica e Escudo', '2233445566KLMN0');
+
+INSERT INTO CAPTURA (quantidade_capturada, cacador_cum, idcriatura, classe_criatura) VALUES
+(10, '7766554433UVWX6', (SELECT idcriatura FROM criatura WHERE nome = 'Dragão'), 'Animais Místicos'),
+(3, '7766554433UVWX6', (SELECT idcriatura FROM criatura WHERE nome = 'Grifo'), 'Seres Monstruosos'),
+(1, '7766554433UVWX6', (SELECT idcriatura FROM criatura WHERE nome = 'Ciclope'), 'Seres Monstruosos'),
+(13, '3344556677YZAB7', (SELECT idcriatura FROM criatura WHERE nome = 'Hipogrifo'), 'Seres Híbridos'),
+(8, '9988776655CDEF8', (SELECT idcriatura FROM criatura WHERE nome = 'Grifo'), 'Seres Monstruosos'),
+(11, '8877665544GHIJ9', (SELECT idcriatura FROM criatura WHERE nome = 'Quimera'), 'Seres Monstruosos'),
+(4, '8877665544GHIJ9', (SELECT idcriatura FROM criatura WHERE nome = 'Dragão'), 'Animais Místicos'),
+(2, '2233445566KLMN0', (SELECT idcriatura FROM criatura WHERE nome = 'Dragão'), 'Animais Místicos'),
+(5, '2233445566KLMN0', (SELECT idcriatura FROM criatura WHERE nome = 'Sátiro'), 'Seres Híbridos'),
+(4, '2233445566KLMN0', (SELECT idcriatura FROM criatura WHERE nome = 'Fauno'), 'Seres Híbridos'),
+(3, '2233445566KLMN0', (SELECT idcriatura FROM criatura WHERE nome = 'Minotauro'), 'Seres Monstruosos');
+
+
+INSERT INTO PROTEGE (nivel_protecao, guardiao_cum, idcriatura, classe_criatura) VALUES
+(5, '1234567890ABCD1', (SELECT idcriatura FROM criatura WHERE nome = 'Dragão'), 'Animais Místicos'),
+(2, '0987654321EFGH2', (SELECT idcriatura FROM criatura WHERE nome = 'Fauno'), 'Seres Híbridos'),
+(3, '0987654321EFGH2', (SELECT idcriatura FROM criatura WHERE nome = 'Sátiro'), 'Seres Híbridos'),
+(6, '1122334455IJKL3', (SELECT idcriatura FROM criatura WHERE nome = 'Quimera'), 'Seres Monstruosos'),
+(7, '5566778899MNOP4', (SELECT idcriatura FROM criatura WHERE nome = 'Ciclope'), 'Seres Monstruosos'),
+(1, '6677889900QRST5', (SELECT idcriatura FROM criatura WHERE nome = 'Grifo'), 'Seres Monstruosos');
+
+INSERT INTO LOCALIZACAO (nome, regiao, descricao) VALUES
+('Floresta Proibida', 'Perto do Reino de Eldoria', 'Uma vasta floresta densa habitada por diversas criaturas mágicas.'),
+('Montanhas da Perdição', 'Ao leste da Fortaleza de Grimhold', 'Cadeia de montanhas íngremes, lar de criaturas raras e perigosas.'),
+('Lago Encantado', 'Próximo à Vila de Brighthollow', 'Um lago profundo e misterioso com propriedades mágicas.'),
+('Caverna do Dragão', 'Abaixo do Castelo de Ironpeak', 'Uma caverna subterrânea conhecida por abrigar dragões e outras criaturas míticas.'),
+('Planícies da Eternidade', 'Entre o Reino de Mont e as Colinas de Ilwind', 'Extensas planícies onde muitas criaturas mágicas migratórias podem ser encontradas.'),
+('Ilha do Trovão', 'Além da Costa do Mar Ocidental', 'Uma ilha isolada constantemente cercada por tempestades.'),
+('Deserto das Sombras', 'Ao sul da Cidade de Blackstone', 'Um deserto vasto e sombrio, lar de criaturas noturnas e perigosas.'),
+('Pântano das Lamentações', 'Nos arredores da Floresta Sombria de Verden', 'Pântano traiçoeiro e cheio de criaturas venenosas e encantadas.'),
+('Vale dos Ventos', 'Ao norte das Montanhas de Windcrest', 'Um vale sempre ventoso, conhecido por ser o habitat de criaturas voadoras.'),
+('Bosque das Fadas', 'Próximo ao Reino de Lumina', 'Bosque encantado onde fadas e outras criaturas mágicas pequenas habitam.');
 
