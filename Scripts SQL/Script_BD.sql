@@ -57,7 +57,7 @@ CREATE TABLE CACADOR_DE_RECOMPENSA (
 -- Table GUARDIAO
 -- -----------------------------------------------------
 CREATE TABLE GUARDIAO (
-  nivel_protecao INT NOT NULL,
+  nivel INT NOT NULL,
   guardiao_cum VARCHAR(15) NOT NULL,
   data_formacao VARCHAR(45) NOT NULL,
   PRIMARY KEY (guardiao_cum),
