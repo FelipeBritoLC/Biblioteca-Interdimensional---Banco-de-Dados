@@ -1,3 +1,7 @@
+-- -----------------------------------------------------
+-- População das tabelas do Banco de Dados Biblioteca Interdimensional
+-- -----------------------------------------------------
+
 -- Inserir classes na tabela CLASSE
 INSERT INTO CLASSE (nome, descricao) VALUES
 ('Seres Monstruosos', 'Criaturas com formas híbridas ou deformadas, geralmente ameaçadoras e com características físicas extraordinárias.'),
