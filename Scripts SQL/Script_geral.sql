@@ -499,3 +499,136 @@ VALUES
    '6677889900QRST5',
    (SELECT id_localizacao FROM LOCALIZACAO WHERE nome = 'Ilha do Trovão'));
    
+
+-- -----------------------------------------------------
+-- VIEW
+-- -----------------------------------------------------
+CREATE OR REPLACE VIEW view_dos_cacadores AS
+SELECT 
+  cdr.cacador_cum,
+  m.nome AS nome_cacador,
+  m.data_nasc,
+  cr.nome AS nome_criatura,
+  cr.idcriatura,
+  cr.classe AS classe_criatura,  
+  ca.quantidade_capturada,
+  cdr.especialidade
+  
+FROM 
+  CACADOR_DE_RECOMPENSA cdr
+JOIN 
+  MAGIZOOLOGISTA m ON cdr.cacador_cum = m.cum
+JOIN 
+  CAPTURA ca ON cdr.cacador_cum = ca.cacador_cum
+JOIN 
+  CRIATURA cr ON ca.idcriatura = cr.idcriatura;
+
+--Chamada da view:
+--SELECT * FROM view_dos_cacadores;
+
+-- -----------------------------------------------------
+-- FUNÇÃO
+-- -----------------------------------------------------
+
+CREATE OR REPLACE FUNCTION get_cacadores_por_criatura(nome_criatura VARCHAR)
+RETURNS TABLE (
+  nome_cacador VARCHAR,
+  especialidade VARCHAR,
+  equipamentos VARCHAR
+) AS $$
+DECLARE
+  cacador_cursor CURSOR FOR
+    SELECT 
+      m.nome AS nome_cacador,
+      cdr.especialidade,
+      cdr.equipamentos
+    FROM 
+      CACADOR_DE_RECOMPENSA cdr
+    JOIN 
+      MAGIZOOLOGISTA m ON cdr.cacador_cum = m.cum
+    JOIN 
+      CAPTURA ca ON cdr.cacador_cum = ca.cacador_cum
+    JOIN 
+      CRIATURA cr ON ca.idcriatura = cr.idcriatura
+    WHERE 
+      cr.nome = nome_criatura;
+  rec RECORD;
+BEGIN
+  RAISE NOTICE 'Caçadores de %:', nome_criatura;
+
+  OPEN cacador_cursor;
+  LOOP
+    FETCH cacador_cursor INTO rec;
+    EXIT WHEN NOT FOUND;
+
+    RAISE NOTICE 'Nome do Caçador: %', rec.nome_cacador;
+
+    RETURN QUERY 
+    SELECT rec.nome_cacador, rec.especialidade, rec.equipamentos;
+  END LOOP;
+
+  CLOSE cacador_cursor;
+END;
+$$ LANGUAGE plpgsql;
+
+
+--Chamada da função:
+--SELECT * FROM get_cacadores_por_criatura('Dragão');
+
+-- -----------------------------------------------------
+-- TRIGGER
+-- -----------------------------------------------------
+
+CREATE TABLE HISTORICO_CAPTURA (
+  id SERIAL PRIMARY KEY,
+  cacador_cum VARCHAR(15) NOT NULL,
+  idcriatura INT NOT NULL,
+  nome_criatura VARCHAR(45) NOT NULL,
+  quantidade_capturada INT,
+  data_alteracao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  acao VARCHAR(50) 
+);
+
+CREATE OR REPLACE FUNCTION log_captura_update()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO HISTORICO_CAPTURA (
+    cacador_cum,
+    idcriatura,
+    nome_criatura, 
+    quantidade_capturada,
+    acao
+  )
+  VALUES (
+    OLD.cacador_cum,
+    OLD.idcriatura,
+    (SELECT nome FROM CRIATURA 
+     WHERE idcriatura = OLD.idcriatura 
+       AND classe = OLD.classe_criatura), 
+    OLD.quantidade_capturada,
+    'UPDATE'
+  );
+  
+  RETURN NEW; 
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER trg_log_captura_update
+AFTER UPDATE ON CAPTURA
+FOR EACH ROW
+EXECUTE FUNCTION log_captura_update();
+
+-- Atualizar o registro na tabela CAPTURA
+--UPDATE CAPTURA
+--SET quantidade_capturada = 11
+--WHERE cacador_cum = '7766554433UVWX6' AND idcriatura = (SELECT idcriatura FROM criatura WHERE nome = 'Dragão');
+
+-- Atualizar o registro na tabela CAPTURA
+--UPDATE CAPTURA
+--SET quantidade_capturada = 17
+--WHERE cacador_cum = '3344556677YZAB7' AND idcriatura = (SELECT idcriatura FROM criatura WHERE nome = 'Hipogrifo');
+
+
+-- Consultar a tabela HISTORICO_CAPTURA para verificar o histórico de alterações
+--SELECT * FROM HISTORICO_CAPTURA;
