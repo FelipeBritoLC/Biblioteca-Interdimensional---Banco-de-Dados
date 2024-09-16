@@ -498,10 +498,200 @@ VALUES
    'Seres Monstruosos', 
    '6677889900QRST5',
    (SELECT id_localizacao FROM LOCALIZACAO WHERE nome = 'Ilha do Trovão'));
-   
+
 
 -- -----------------------------------------------------
--- VIEW
+-- 1 consulta com uma tabela usando operadores básicos de filtro (e.g., IN,
+--between, is null, etc).
+-- -----------------------------------------------------
+
+--Justificativa: Esta consulta usa o operador IN para filtrar criaturas que 
+--têm o poder 'Fogo', mostrando suas informações.
+
+SELECT nome, descricao
+FROM CRIATURA
+WHERE idcriatura IN (
+  SELECT idcriatura
+  FROM CRIATURA_TEM_PODER
+  WHERE poder = 'Lançar Feitiços'
+);
+
+-- -----------------------------------------------------
+--3 consultas com inner JOIN na cláusula FROM (pode ser self join, caso o
+--domínio indique esse uso).
+-- -----------------------------------------------------
+
+--Justificativa: fornecer um panorama completo dos registros de criaturas no banco de dados.
+SELECT
+    r.id_registro,
+    r.data,
+    c.nome AS nome_criatura,
+    m.nome AS nome_magizoologista,
+    l.nome AS nome_localizacao,
+    l.regiao
+FROM
+    REGISTRO r
+    INNER JOIN CRIATURA c ON r.idcriatura = c.idcriatura AND r.classe_criatura = c.classe
+    INNER JOIN MAGIZOOLOGISTA m ON r.cum_magizoologista = m.cum
+    INNER JOIN LOCALIZACAO l ON r.id_localizacao = l.id_localizacao;
+
+
+--Justificativa: Listar todos os poderes de uma criatura e suas descrições, incluindo o nome da criatura.
+SELECT cr.nome AS nome_criatura, p.nome AS nome_poder, p.descricao
+FROM CRIATURA cr
+INNER JOIN CRIATURA_TEM_PODER ctp ON cr.idcriatura = ctp.idcriatura
+INNER JOIN PODER p ON ctp.poder = p.nome;
+
+
+--Justificativa:Fornece uma visão detalhada sobre quais poderes estão associados a 
+--quais criaturas, bem como o nível de perigo de cada poder.
+SELECT
+    c.nome AS nome_criatura,
+    c.descricao AS descricao_criatura,
+    p.nome AS poder,
+    p.descricao AS descricao_poder,
+    n.nome AS nivel_perigo
+FROM
+    CRIATURA_TEM_PODER ct
+    INNER JOIN CRIATURA c ON ct.idcriatura = c.idcriatura AND ct.classe_criatura = c.classe
+    INNER JOIN PODER p ON ct.poder = p.nome
+    INNER JOIN nivel_perigo n ON p.nivel_perigo_nome = n.nome;
+
+-- -----------------------------------------------------
+--1 consulta com left/right/full outer join na cláusula FROM
+-- -----------------------------------------------------
+
+--Justificativa: Suponha que você deseja listar todas as criaturas, incluindo seus 
+--poderes associados, se existirem. Se uma criatura não tiver nenhum poder associado, 
+--ainda assim será incluída na lista, mas com informações de poder como NULL.
+SELECT
+    c.nome AS nome_criatura,
+    c.descricao AS descricao_criatura,
+    p.nome AS nome_poder,
+    p.descricao AS descricao_poder
+FROM
+    CRIATURA c
+    LEFT JOIN CRIATURA_TEM_PODER ct ON c.idcriatura = ct.idcriatura AND c.classe = ct.classe_criatura
+    LEFT JOIN PODER p ON ct.poder = p.nome;
+-- -----------------------------------------------------
+--2 consultas usando Group By (e possivelmente o having)
+-- -----------------------------------------------------
+
+--1. Justificativa: Mostra o número de criaturas em cada classe
+SELECT
+    c.classe AS nome_classe,
+    COUNT(c.idcriatura) AS quantidade_criaturas
+FROM
+    CRIATURA c
+GROUP BY
+    c.classe;
+
+--2. Justificativa: Mostra o número de criaturas que cada poder é possuído
+SELECT
+    p.nome AS nome_poder,
+    COUNT(ct.idcriatura) AS quantidade_criaturas
+FROM
+    PODER p
+    INNER JOIN CRIATURA_TEM_PODER ct ON p.nome = ct.poder
+GROUP BY
+    p.nome
+HAVING
+    COUNT(ct.idcriatura) > 0;
+
+-- -----------------------------------------------------
+--1 consulta usando alguma operação de conjunto (union, except ou intersect)
+-- -----------------------------------------------------
+--Justificativa: fornece uma lista das criaturas (com ID e nome) que têm pelo menos um poder 
+--classificado como "alto", excluindo aquelas que não têm nenhum poder de nível "alto".
+SELECT
+    c.idcriatura,
+    c.nome
+FROM
+    CRIATURA c
+    INNER JOIN CRIATURA_TEM_PODER ct ON c.idcriatura = ct.idcriatura AND c.classe = ct.classe_criatura
+    INNER JOIN PODER p ON ct.poder = p.nome
+    INNER JOIN nivel_perigo n ON p.nivel_perigo_nome = n.nome
+WHERE
+    n.nome = 'alto'
+
+EXCEPT
+
+SELECT
+    c.idcriatura,
+    c.nome
+FROM
+    CRIATURA c
+    INNER JOIN CRIATURA_TEM_PODER ct ON c.idcriatura = ct.idcriatura AND c.classe = ct.classe_criatura
+    LEFT JOIN PODER p ON ct.poder = p.nome
+    LEFT JOIN nivel_perigo n ON p.nivel_perigo_nome = n.nome
+WHERE
+    n.nome IS DISTINCT FROM 'alto';
+
+-- -----------------------------------------------------
+--2 consultas que usem subqueries.
+-- -----------------------------------------------------
+--1. Justificativa: encontra os magizoologistas que têm registrado a captura de criaturas em localizações específicas, como "Floresta Proibida"
+
+SELECT
+    m.nome,
+    m.cum
+FROM
+    MAGIZOOLOGISTA m
+WHERE
+    m.cum IN (
+        SELECT
+            r.cum_magizoologista
+        FROM
+            REGISTRO r
+            INNER JOIN LOCALIZACAO l ON r.id_localizacao = l.id_localizacao
+        WHERE
+            l.nome IN ('Floresta Proibida')
+    );
+
+--2. Justificativa: Consulta principal para encontrar as criaturas com o maior número de poderes
+SELECT
+    c.idcriatura,
+    c.nome,
+    COUNT(ct.poder) AS total_poderes
+FROM
+    CRIATURA c
+    INNER JOIN CRIATURA_TEM_PODER ct ON c.idcriatura = ct.idcriatura AND c.classe = ct.classe_criatura
+GROUP BY
+    c.idcriatura, c.nome
+HAVING
+    COUNT(ct.poder) = (
+        -- Subconsulta para encontrar o maior número de poderes de qualquer criatura
+        SELECT
+            MAX(poder_count)
+        FROM (
+            SELECT
+                c.idcriatura,
+                COUNT(ct.poder) AS poder_count
+            FROM
+                CRIATURA c
+                INNER JOIN CRIATURA_TEM_PODER ct ON c.idcriatura = ct.idcriatura AND c.classe = ct.classe_criatura
+            GROUP BY
+                c.idcriatura
+        ) AS subquery
+    );
+-- -----------------------------------------------------
+-- VIEW QUE PERMITE INSERÇÃO
+-- -----------------------------------------------------
+CREATE OR REPLACE VIEW visao_insercao_criatura AS
+SELECT idcriatura, nome, classe
+FROM CRIATURA
+WITH CHECK OPTION; -- Inserção de dados
+
+-- Testanto inserção de dados de uma nova criatura
+--INSERT INTO visao_insercao_criatura (idcriatura, nome, classe)
+--VALUES (47, 'Formiga', 'Seres Monstruosos');
+
+-- Testando view
+--SELECT * FROM visao_insercao_criatura;
+
+
+-- -----------------------------------------------------
+-- VIEW ROBUSTA 1
 -- -----------------------------------------------------
 CREATE OR REPLACE VIEW view_dos_cacadores AS
 SELECT 
@@ -526,10 +716,114 @@ JOIN
 --Chamada da view:
 --SELECT * FROM view_dos_cacadores;
 
+
+-- -----------------------------------------------------
+-- VIEW ROBUSTA 2
+-- -----------------------------------------------------
+
+CREATE OR REPLACE VIEW total_capturas_cacador AS
+SELECT 
+    MAGIZOOLOGISTA.nome AS "nome do cacador",
+    CACADOR_DE_RECOMPENSA.cacador_cum AS cum,
+    SUM(CAPTURA.quantidade_capturada) AS "total de criaturas capturadas"
+FROM 
+    CACADOR_DE_RECOMPENSA
+JOIN 
+    MAGIZOOLOGISTA ON CACADOR_DE_RECOMPENSA.cacador_cum = MAGIZOOLOGISTA.cum
+JOIN 
+    CAPTURA ON CACADOR_DE_RECOMPENSA.cacador_cum = CAPTURA.cacador_cum
+GROUP BY 
+    MAGIZOOLOGISTA.nome, CACADOR_DE_RECOMPENSA.cacador_cum;
+
+SELECT * FROM total_capturas_cacador;
+--Chamada da view:
+--SELECT * FROM total_capturas_cacador;
+
+
+
+
+
+-- -----------------------------------------------------
+-- ÍNDICES
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- ÍNDICE 1
+-- -----------------------------------------------------
+CREATE INDEX idx_criatura_nome ON CRIATURA(nome); -- banco de dados localize rapidamente as linhas onde nome = 'Dragão' sem precisar varrer toda a tabela.
+
+-- -----------------------------------------------------
+-- ÍNDICE 2
+-- -----------------------------------------------------
+CREATE INDEX idx_magizoologista_cum ON MAGIZOOLOGISTA(cum); -- consultas na tabela MAGIZOOLOGISTA que façam filtros ou junções na coluna cum, agilizando essas operações.
+
+-- -----------------------------------------------------
+-- ÍNDICE 3
+-- -----------------------------------------------------
+CREATE INDEX idx_poder_nome ON PODER(nome); --melhoraria o desempenho de consultas que filtrem ou façam junção usando a coluna nome na tabela PODER.
+
+
+-- -----------------------------------------------------
+-- REESCRITA DE CONSULTAS
+-- -----------------------------------------------------
+
+-- CONSULTA 1: para listar criaturas que têm o poder 'Lançar Feitiços'
+SELECT
+    c.nome,
+    c.descricao
+FROM
+    CRIATURA c
+WHERE
+    EXISTS (
+        -- Subconsulta para verificar se a criatura possui o poder 'Lançar Feitiços'
+        SELECT 1
+        FROM CRIATURA_TEM_PODER ct
+        WHERE
+            ct.idcriatura = c.idcriatura
+            AND ct.poder = 'Lançar Feitiços'
+    );
+
+--A mudança de IN para EXISTS melhora a eficiência da consulta, pois EXISTS para de buscar assim que encontra a primeira correspondência, o que pode ser mais rápido. Além disso, EXISTS torna a consulta mais clara e direta ao verificar a presença do poder associado à criatura.
+
+
+-- CONSULTA 2: Justificativa - Mostra o número de criaturas em cada classe, ordenado pela quantidade em ordem decrescente
+SELECT
+    c.classe AS nome_classe,
+    COUNT(c.idcriatura) AS quantidade_criaturas
+FROM
+    CRIATURA c
+GROUP BY
+    c.classe
+ORDER BY
+    quantidade_criaturas DESC;
+
+
+
 -- -----------------------------------------------------
 -- FUNÇÃO
 -- -----------------------------------------------------
 
+-- 1 função que use SUM, MAX, MIN, AVG ou COUNT
+CREATE FUNCTION contar_criaturas() RETURNS INT AS $$
+BEGIN
+   RETURN (SELECT COUNT(*) FROM CRIATURA); -- COUNT
+END;
+$$ LANGUAGE plpgsql;
+SELECT contar_criaturas();
+
+
+-- Função para Calcular a Idade de um Herói
+CREATE FUNCTION idade_heroi(nome_heroi VARCHAR) RETURNS
+INT AS $$
+BEGIN
+   RETURN EXTRACT(YEAR FROM AGE((SELECT data_nasc FROM HEROI WHERE nome = nome_heroi)));
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT idade_heroi('Harry Potter');
+
+
+-- Função Mostrar caçadores através de criatura 
 CREATE OR REPLACE FUNCTION get_cacadores_por_criatura(nome_criatura VARCHAR)
 RETURNS TABLE (
   nome_cacador VARCHAR,
@@ -576,7 +870,7 @@ $$ LANGUAGE plpgsql;
 --SELECT * FROM get_cacadores_por_criatura('Dragão');
 
 -- -----------------------------------------------------
--- TRIGGER
+-- TRIGGER 1
 -- -----------------------------------------------------
 
 CREATE TABLE HISTORICO_CAPTURA (
@@ -620,15 +914,76 @@ FOR EACH ROW
 EXECUTE FUNCTION log_captura_update();
 
 -- Atualizar o registro na tabela CAPTURA
---UPDATE CAPTURA
---SET quantidade_capturada = 11
---WHERE cacador_cum = '7766554433UVWX6' AND idcriatura = (SELECT idcriatura FROM criatura WHERE nome = 'Dragão');
+UPDATE CAPTURA
+SET quantidade_capturada = 11
+WHERE cacador_cum = '7766554433UVWX6' AND idcriatura = (SELECT idcriatura FROM criatura WHERE nome = 'Dragão');
 
--- Atualizar o registro na tabela CAPTURA
---UPDATE CAPTURA
---SET quantidade_capturada = 17
---WHERE cacador_cum = '3344556677YZAB7' AND idcriatura = (SELECT idcriatura FROM criatura WHERE nome = 'Hipogrifo');
 
 
 -- Consultar a tabela HISTORICO_CAPTURA para verificar o histórico de alterações
---SELECT * FROM HISTORICO_CAPTURA;
+SELECT * FROM HISTORICO_CAPTURA;
+
+
+-- -----------------------------------------------------
+-- TRIGGER 2
+-- -----------------------------------------------------
+
+CREATE OR REPLACE FUNCTION verificaQuantidadeCapturada()
+RETURNS trigger AS $$
+BEGIN
+    -- Garante que a quantidade capturada seja maior que zero
+    IF NEW.quantidade_capturada <= 0 THEN
+        RAISE EXCEPTION 'A quantidade capturada deve ser maior que zero';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER triggerVerificaCaptura
+BEFORE INSERT OR UPDATE ON captura
+FOR EACH ROW
+EXECUTE FUNCTION verificaQuantidadeCapturada();
+
+-- Tentando inserir uma captura com quantidade inválida
+INSERT INTO captura (quantidade_capturada, cacador_cum, idcriatura, classe_criatura)
+VALUES (-1, 'ABC123', 1, 'Dragão');
+
+-- Tentando inserir uma captura válida
+INSERT INTO captura (quantidade_capturada, cacador_cum, idcriatura, classe_criatura)
+VALUES (3, '7766554433UVWX6', 1, 'Seres Monstruosos');
+
+-- Verificar se as capturas foram inseridas corretamente
+SELECT * FROM captura;
+
+-- -----------------------------------------------------
+-- TRIGGER 3
+-- -----------------------------------------------------
+CREATE OR REPLACE FUNCTION verificaDataNascimento()
+RETURNS trigger AS $$
+BEGIN
+    -- Verifica se a data de nascimento é anterior à data atual
+    IF NEW.data_nasc > CURRENT_DATE THEN
+        RAISE EXCEPTION 'A data de nascimento não pode ser uma data futura';
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER triggerVerificaMagizoologista
+BEFORE INSERT OR UPDATE ON magizoologista
+FOR EACH ROW
+EXECUTE FUNCTION verificaDataNascimento();
+
+-- Tentando inserir um magizoologista com uma data de nascimento no futuro
+INSERT INTO magizoologista (cum, nome, data_nasc) 
+VALUES ('DEF456', 'Novo Magizoologista', '2025-01-01');
+
+-- Tentando inserir um magizoologista com uma data válida
+INSERT INTO magizoologista (cum, nome, data_nasc) 
+VALUES ('DEF456', 'Novo Magizoologista', '1990-05-23');
+
+-- Verificar se os magizoologistas foram inseridos corretamente
+SELECT * FROM magizoologista;
+
