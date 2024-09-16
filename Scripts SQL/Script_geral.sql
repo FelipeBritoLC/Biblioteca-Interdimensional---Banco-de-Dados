@@ -866,14 +866,19 @@ SELECT * FROM get_cacadores_por_criatura('Dragão');
 -- -----------------------------------------------------
 -- PROCEDURE
 -- -----------------------------------------------------
---Atualiza o nivel de um guardião, com tratamento para ver se o CUM dado existe, se o novo nível é válido.
-CREATE OR REPLACE PROCEDURE AtualizarNivelProtecao(
+--Atualiza o nivel de um guardião, com tratamento para ver se o CUM dado existe e se o novo nível é válido.
+CREATE OR REPLACE PROCEDURE AtualizarNivelGuardiao(
     p_guardiao_cum VARCHAR(15),
     p_novo_nivel INT
 )
 LANGUAGE plpgsql
 AS $$
 BEGIN
+    -- Verificar se o nível é maior que zero
+    IF p_novo_nivel <= 0 THEN
+        RAISE EXCEPTION 'Nível % é inválido. O nível deve ser um valor maior que zero.', p_novo_nivel;
+    END IF;
+
     -- Tentar atualizar o nível de proteção do guardião
     UPDATE GUARDIAO
     SET nivel = p_novo_nivel
@@ -885,18 +890,14 @@ BEGIN
     END IF;
 
 EXCEPTION
-    -- Tratamento para quando o nível informado for inválido (menor que zero, por exemplo)
-    WHEN check_violation THEN
-        RAISE NOTICE 'Nível % é inválido. O nível deve ser um valor positivo.', p_novo_nivel;
-
-    -- Tratamento para qualquer outro erro
+    -- Tratamento para outros erros inesperados
     WHEN OTHERS THEN
         RAISE NOTICE 'Erro ao atualizar o nível de proteção: %', SQLERRM;
 END $$;
 
 
 --teste da procedure
-CALL AtualizarNivelProtecao('1234567890ABCD1', 7);
+CALL AtualizarNivelGuardiao('1234567890ABCD1', 7);
 SELECT * FROM guardiao;
 
 -- -----------------------------------------------------
