@@ -739,10 +739,6 @@ SELECT * FROM total_capturas_cacador;
 --Chamada da view:
 --SELECT * FROM total_capturas_cacador;
 
-
-
-
-
 -- -----------------------------------------------------
 -- ÍNDICES
 -- -----------------------------------------------------
@@ -812,18 +808,16 @@ $$ LANGUAGE plpgsql;
 SELECT contar_criaturas();
 
 
--- Função para Calcular a Idade de um Herói
-CREATE FUNCTION idade_heroi(nome_heroi VARCHAR) RETURNS
-INT AS $$
+-- 2 Função para Verificar nivel de perigo de um poder
+CREATE FUNCTION verificar_perigo_poder(nome_poder VARCHAR) RETURNS VARCHAR AS $$
 BEGIN
-   RETURN EXTRACT(YEAR FROM AGE((SELECT data_nasc FROM HEROI WHERE nome = nome_heroi)));
+   RETURN (SELECT nivel_perigo_nome FROM PODER WHERE nome = nome_poder);
 END;
 $$ LANGUAGE plpgsql;
+SELECT verificar_perigo_poder('Cuspir Fogo');
 
-SELECT idade_heroi('Harry Potter');
 
-
--- Função Mostrar caçadores através de criatura 
+-- 3 Função Mostrar caçadores através de criatura 
 CREATE OR REPLACE FUNCTION get_cacadores_por_criatura(nome_criatura VARCHAR)
 RETURNS TABLE (
   nome_cacador VARCHAR,
@@ -867,7 +861,43 @@ $$ LANGUAGE plpgsql;
 
 
 --Chamada da função:
---SELECT * FROM get_cacadores_por_criatura('Dragão');
+SELECT * FROM get_cacadores_por_criatura('Dragão');
+
+-- -----------------------------------------------------
+-- PROCEDURE
+-- -----------------------------------------------------
+--Atualiza o nivel de um guardião, com tratamento para ver se o CUM dado existe, se o novo nível é válido.
+CREATE OR REPLACE PROCEDURE AtualizarNivelProtecao(
+    p_guardiao_cum VARCHAR(15),
+    p_novo_nivel INT
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Tentar atualizar o nível de proteção do guardião
+    UPDATE GUARDIAO
+    SET nivel = p_novo_nivel
+    WHERE guardiao_cum = p_guardiao_cum;
+
+    -- Verificar se alguma linha foi atualizada
+    IF NOT FOUND THEN
+        RAISE EXCEPTION 'Guardião com CUM % não encontrado.', p_guardiao_cum;
+    END IF;
+
+EXCEPTION
+    -- Tratamento para quando o nível informado for inválido (menor que zero, por exemplo)
+    WHEN check_violation THEN
+        RAISE NOTICE 'Nível % é inválido. O nível deve ser um valor positivo.', p_novo_nivel;
+
+    -- Tratamento para qualquer outro erro
+    WHEN OTHERS THEN
+        RAISE NOTICE 'Erro ao atualizar o nível de proteção: %', SQLERRM;
+END $$;
+
+
+--teste da procedure
+CALL AtualizarNivelProtecao('1234567890ABCD1', 7);
+SELECT * FROM guardiao;
 
 -- -----------------------------------------------------
 -- TRIGGER 1
