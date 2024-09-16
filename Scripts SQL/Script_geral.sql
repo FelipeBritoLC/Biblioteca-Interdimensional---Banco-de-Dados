@@ -809,18 +809,28 @@ WHERE
 
 --A versão otimizada usa uma subconsulta com EXISTS para verificar diretamente a presença de poderes de nível "alto", o que pode ser mais eficiente do que usar EXCEPT.
 
-
--- CONSULTA 2: Justificativa - Mostra o número de criaturas em cada classe, ordenado pela quantidade em ordem decrescente
+-- CONSULTA 2:ORIGINAL
+-- Mostra o número de criaturas em cada classe
 SELECT
     c.classe AS nome_classe,
     COUNT(c.idcriatura) AS quantidade_criaturas
 FROM
     CRIATURA c
 GROUP BY
-    c.classe
-ORDER BY
-    quantidade_criaturas DESC;
+    c.classe;
 
+
+-- CONSULTA 2:OTIMIZADA
+-- Otimização para listar o número de criaturas por classe
+SELECT
+    classe,
+    COUNT(*) AS total_criaturas
+FROM
+    CRIATURA
+GROUP BY
+    classe;
+
+--Como estamos lidando com apenas 1 tabela, não precisamos usar o alias e count(*) é mais direto no contexto.
 
 
 -- -----------------------------------------------------
