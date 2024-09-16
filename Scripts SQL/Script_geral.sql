@@ -763,23 +763,51 @@ CREATE INDEX idx_poder_nome ON PODER(nome); --melhoraria o desempenho de consult
 -- REESCRITA DE CONSULTAS
 -- -----------------------------------------------------
 
--- CONSULTA 1: para listar criaturas que têm o poder 'Lançar Feitiços'
+-- CONSULTA 1:ORIGINAL
 SELECT
-    c.nome,
-    c.descricao
+    c.idcriatura,
+    c.nome
+FROM
+    CRIATURA c
+    INNER JOIN CRIATURA_TEM_PODER ct ON c.idcriatura = ct.idcriatura AND c.classe = ct.classe_criatura
+    INNER JOIN PODER p ON ct.poder = p.nome
+    INNER JOIN nivel_perigo n ON p.nivel_perigo_nome = n.nome
+WHERE
+    n.nome = 'alto'
+
+EXCEPT
+
+SELECT
+    c.idcriatura,
+    c.nome
+FROM
+    CRIATURA c
+    INNER JOIN CRIATURA_TEM_PODER ct ON c.idcriatura = ct.idcriatura AND c.classe = ct.classe_criatura
+    LEFT JOIN PODER p ON ct.poder = p.nome
+    LEFT JOIN nivel_perigo n ON p.nivel_perigo_nome = n.nome
+WHERE
+    n.nome IS DISTINCT FROM 'alto';
+
+
+-- CONSULTA 1:OTIMIZADA
+SELECT DISTINCT
+    c.idcriatura,
+    c.nome
 FROM
     CRIATURA c
 WHERE
     EXISTS (
-        -- Subconsulta para verificar se a criatura possui o poder 'Lançar Feitiços'
         SELECT 1
-        FROM CRIATURA_TEM_PODER ct
-        WHERE
-            ct.idcriatura = c.idcriatura
-            AND ct.poder = 'Lançar Feitiços'
+        FROM CRIATURA_TEM_PODER ctp
+        JOIN PODER p ON ctp.poder = p.nome
+        JOIN nivel_perigo np ON p.nivel_perigo_nome = np.nome
+        WHERE c.idcriatura = ctp.idcriatura
+          AND c.classe = ctp.classe_criatura
+          AND np.nome = 'medio'
     );
 
---A mudança de IN para EXISTS melhora a eficiência da consulta, pois EXISTS para de buscar assim que encontra a primeira correspondência, o que pode ser mais rápido. Além disso, EXISTS torna a consulta mais clara e direta ao verificar a presença do poder associado à criatura.
+
+--A versão otimizada usa uma subconsulta com EXISTS para verificar diretamente a presença de poderes de nível "alto", o que pode ser mais eficiente do que usar EXCEPT.
 
 
 -- CONSULTA 2: Justificativa - Mostra o número de criaturas em cada classe, ordenado pela quantidade em ordem decrescente
